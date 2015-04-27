@@ -1,0 +1,21 @@
+{
+  "name": "wi-scrapbook",
+  "version": "0.0.1",
+  "private": true,
+  "author": "Lovell Fuller <npm@lovell.info>",
+  "description": "Stoke Ferry WI Scrapbook 1965",
+  "scripts": {
+    "generate": "iojs ./generate.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lovell/wi-scrapbook"
+  },
+  "devDependencies": {
+    "sharp": "^0.10.0"
+  },
+  "license": "Apache 2.0",
+  "engines": {
+    "node": ">=1.0.0"
+  }
+}

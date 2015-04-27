@@ -1,0 +1,156 @@
+<html>
+  <head>
+    <title>Stoke Ferry WI Scrapbook 1965</title>
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
+    <style>
+    #pages {
+      margin-top: 0;
+    }
+    #zoom-row {
+      height: calc(100% - 148px);
+    }
+    nav li {
+      cursor: pointer;
+    }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <nav class="text-center">
+          <ul class="pagination">
+            <li><a class="month" data-month="00">Cover</a></li>
+            <li><a class="month" data-month="01">Jan</a></li>
+            <li><a class="month" data-month="02">Feb</a></li>
+            <li><a class="month" data-month="03">Mar</a></li>
+            <li><a class="month" data-month="04">Apr</a></li>
+            <li><a class="month" data-month="05">May</a></li>
+            <li><a class="month" data-month="06">Jun</a></li>
+            <li><a class="month" data-month="07">Jul</a></li>
+            <li><a class="month" data-month="08">Aug</a></li>
+            <li><a class="month" data-month="09">Sep</a></li>
+            <li><a class="month" data-month="10">Oct</a></li>
+            <li><a class="month" data-month="11">Nov</a></li>
+            <li><a class="month" data-month="12">Dec</a></li>
+          </ul>
+        </nav>
+        <span id="month-thumbnails"></span>
+      </div>
+      <div class="row">
+        <nav class="text-center">
+          <ul class="pagination" id="pages"></ul>
+        </nav>
+        <span id="page-thumbnails"></span>
+      </div>
+      <div class="row" id="zoom-row">
+        <div id="zoom"></div>
+      </div>
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/zepto/1.1.4/zepto.min.js"></script>
+    <script src="//openseadragon.github.io/openseadragon/openseadragon.min.js"></script>
+    <script>
+    $(function() {
+      var viewer = null;
+      $.getJSON('months.json', function(months) {
+        for (var month in months) {
+          $('#month-thumbnails').append(
+            '<img id="month-thumbnail-' + month + '" class="hidden" src="tiles/' + month + '-' + months[month][0] + '.jpg">'
+          );
+        }
+        $('a.month').on('mouseenter', function() {
+          // Event: enter month, show thumbnail
+          var a = $(this);
+          var position = a.position();
+          var thumbnail = $('#month-thumbnail-' + a.data('month'));
+          thumbnail.css({
+            position: 'absolute',
+            zIndex: 10,
+            top: position.top + a.height() + 2,
+            left: position.left - 67 + (a.width() / 2)
+          }).removeClass('hidden');
+          return false;
+        }).on('mouseleave', function() {
+          // Event: leave month, hide thumbnail
+          $('#month-thumbnail-' + $(this).data('month')).addClass('hidden');
+          return false;
+        }).on('click', function() {
+          // Event: click month
+          var month = $(this).data('month');
+          // Update active month
+          $('a.month').each(function() {
+            var a = $(this);
+            if (month === a.data('month')) {
+              a.parent().addClass('active');
+            } else {
+              a.parent().removeClass('active');
+            }
+          });
+          // Update pages for month
+          $('#pages').empty();
+          $('#page-thumbnails').empty();
+          months[month].forEach(function(page) {
+            $('#pages').append(
+              '<li><a class="page" data-page="' + page + '">' + page.replace(/^[0]+/g, '') + '</a></li>'
+            );
+            $('#page-thumbnails').append(
+              '<img id="page-thumbnail-' + page + '" class="hidden" src="tiles/' + month + '-' + page + '.jpg">'
+            );
+          });
+          $('a.page').on('mouseenter', function() {
+            // Event: enter page, show thumbnail
+            var a = $(this);
+            var position = a.position();
+            var thumbnail = $('#page-thumbnail-' + a.data('page'));
+            thumbnail.css({
+              position: 'absolute',
+              zIndex: 10,
+              top: position.top + a.height() + 2,
+              left: position.left - 67 + (a.width() / 2)
+            }).removeClass('hidden');
+            return false;
+          }).on('mouseleave', function() {
+            // Event: leave page, hide thumbnail
+            $('#page-thumbnail-' + $(this).data('page')).addClass('hidden');
+            return false;
+          }).on('click', function() {
+            // Event: click page
+            var page = $(this).data('page');
+            // Update active page
+            $('a.page').each(function() {
+              var a = $(this);
+              if (page === a.data('page')) {
+                a.parent().addClass('active');
+              } else {
+                a.parent().removeClass('active');
+              }
+            });
+            // Update Deep Zoom
+            if (viewer) {
+              viewer.close();
+              viewer.destroy();
+            }
+            viewer = OpenSeadragon({
+              id: 'zoom',
+              prefixUrl: '//openseadragon.github.io/openseadragon/images/',
+              tileSources: 'tiles/' + month + '-' + page + '.dzi'
+            });
+            return false;
+          });
+          // Remove Deep Zoom
+          if (viewer) {
+            viewer.close();
+            viewer.destroy();
+            viewer = null;
+          }
+          return false;
+        });
+      });
+    });
+    </script>    
+
+  </body>
+
+</html>
