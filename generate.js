@@ -22,21 +22,29 @@ fs.readdirSync(source).forEach(function(month) {
       const inputFile = path.join(source, month, page);
       const outputFilePrefix = path.join(dest, month + '-' + pageNumber[1]);
       // Generate Deep Zoom
-      sharp(inputFile)
-        .toFile(outputFilePrefix + '.dzi')
-        .then(function() {
-          console.log('Generated DZI for page ' + pageNumber[1]);        
-        });
+      if (!fs.statSync(outputFilePrefix + '.dzi').isFile()) {
+        sharp(inputFile)
+          .toFile(outputFilePrefix + '.dzi')
+          .then(function() {
+            console.log('Generated DZI for page ' + pageNumber[1]);
+          });
+      } else {
+        console.log('DZI exists for page ' + pageNumber[1]);
+      }
       // Generate thumbnail
-      sharp(inputFile)
-        .resize(134, 178)
-        .sharpen()
-        .quality(75)
-        .trellisQuantisation()
-        .toFile(outputFilePrefix + '.jpg')
-        .then(function() {
-          console.log('Generated thumb for page ' + pageNumber[1]); 
-        });
+      if (!fs.statSync(outputFilePrefix + '.jpg').isFile()) {
+        sharp(inputFile)
+          .resize(134, 178)
+          .sharpen()
+          .quality(75)
+          .trellisQuantisation()
+          .toFile(outputFilePrefix + '.jpg')
+          .then(function() {
+            console.log('Generated thumb for page ' + pageNumber[1]);
+          });
+      } else {
+        console.log('Thumb exists for page ' + pageNumber[1]);
+      }
     } else {
       console.log('Skipping ' + page);
     }
